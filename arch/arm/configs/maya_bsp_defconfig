@@ -497,10 +497,16 @@ CONFIG_MTK_MXC622X=y
 
 # ALSPS
 CONFIG_CUSTOM_KERNEL_ALSPS=y
-CONFIG_MTK_ALSPSHUB=y
-CONFIG_CUSTOM_KERNEL_SENSORHUB=y
-CONFIG_NANOHUB=y
 
+################################
+# TESTING                      #
+################################
+
+#CONFIG_MTK_ALSPSHUB=y
+#CONFIG_CUSTOM_KERNEL_SENSORHUB=y
+#CONFIG_NANOHUB=y
+
+################################
 
 # CAMS & LENS
 CONFIG_CUSTOM_KERNEL_IMGSENSOR="hi843b_mipi_raw gc5005_mipi_raw"
