@@ -151,7 +151,7 @@ static imgsensor_info_struct imgsensor_info = {
 	.sensor_output_dataformat = SENSOR_OUTPUT_FORMAT_RAW_Gb,
 	.mclk = 24,
 	.mipi_lane_num = SENSOR_MIPI_4_LANE,
-	.i2c_addr_table = {0x40,0xff},
+	.i2c_addr_table = {0x37,0xff},
 };
 
 static imgsensor_struct imgsensor = {
@@ -166,7 +166,7 @@ static imgsensor_struct imgsensor = {
     .test_pattern = KAL_FALSE, 
 	.current_scenario_id = MSDK_SCENARIO_ID_CAMERA_PREVIEW,//current scenario id
     .ihdr_en = 0, 
-	.i2c_write_id = 0x40,
+	.i2c_write_id = 0x37,
 };
 
 
