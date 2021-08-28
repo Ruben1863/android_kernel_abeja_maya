@@ -20,14 +20,15 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580)
 | Other | `kd_camera_hw (i2c 0-0036)` | Yes | Yes |
 
 ## Known Bugs
-- Hi843b: camera sensor is inverted at least in the rom im testing, so lets wait for LOS 15 build to know if its really bugged
-- Gc5005: camera sensor have the worst quality I have ever seen :D
-- ALS/PS: sensor is unknwon, so for now there isn't light/proximity sensor
-- Main speaker: its operation is unknown because in my device the speaker died a long time ago :(
-- System lags
+- Hi843b: camera sensor is inverted, and really poor quality.
+- Gc5005: camera sensor have the worst quality I have ever seen.
+- Flashlight.
+- ALS/PS: sensor is unknwon, so for now there isn't light/proximity sensor.
+- Main speaker: its operation is unknown because in my device the speaker died a long time ago.
+- System lags, or screen refresh (48.3 HZ) is too low and seems it.
 
 ## Current kernel features:
-* Underclock CPU To 260MHz
+* Underclock CPU To 260MHz.
 
 ## Acknowledgements:
 
