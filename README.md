@@ -1,6 +1,6 @@
 # Kernel Abeja Maya
 
-This is custom kernel (3.18.79) source for Bluboo Maya (MT6580)
+This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 
 ## Known information:
 | Subsystem | Driver name | Availability | Working |
@@ -20,7 +20,7 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580)
 | Other | `kd_camera_hw (i2c 0-0036)` | Yes | Yes |
 
 ## Known Bugs
-- Hi843b: camera sensor is inverted, and really poor quality.
+- Hi843b: camera colour is blue.
 - Gc5005: camera sensor have the worst quality I have ever seen.
 - Flashlight.
 - ALS/PS: sensor is unknwon, so for now there isn't light/proximity sensor.
