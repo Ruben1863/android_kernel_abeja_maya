@@ -157,6 +157,7 @@ typedef enum {
 #define FLASH_IOC_SET_TIME_OUT_TIME_MS  _IOR(FLASHLIGHT_MAGIC, 100, int)
 #define FLASH_IOC_SET_STEP		        _IOR(FLASHLIGHT_MAGIC, 105, int)
 #define FLASH_IOC_SET_DUTY				_IOR(FLASHLIGHT_MAGIC, 110, int)
+#define FLASH_IOC_SET_DUTY_OFFSET_MA    _IOR(FLASHLIGHT_MAGIC, 111, int)
 #define FLASH_IOC_SET_ONOFF		_IOR(FLASHLIGHT_MAGIC, 115, int)
 #define FLASH_IOC_UNINIT		_IOR(FLASHLIGHT_MAGIC, 120, int)
 
@@ -237,6 +238,7 @@ int mt6332_OpenBoost4Flash(void);
 int mt6332_CloseBoost4Flash(void);
 
 /* GPIO pinctrl */
+int strobe_gpio_init(struct platform_device *pdev);
 int flashlight_gpio_init(struct platform_device *pdev);
 int flashlight_gpio_set(int pin, int state);
 int flashlight_gpio_hwen_high(void);

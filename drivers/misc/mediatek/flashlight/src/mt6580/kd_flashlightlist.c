@@ -712,7 +712,9 @@ static int flashlight_probe(struct platform_device *dev)
 	init_waitqueue_head(&flashlight_private.read_wait);
 	/* init_MUTEX(&flashlight_private.sem); */
 	sema_init(&flashlight_private.sem, 1);
-
+// add by ruben1863
+    strobe_gpio_init(dev);
+// end
 	logI("[flashlight_probe] Done ~");
 	return 0;
 
@@ -755,6 +757,19 @@ static void flashlight_shutdown(struct platform_device *dev)
 	logI("[flashlight_shutdown] Done ~");
 }
 
+#ifdef CONFIG_OF
+#include <linux/of.h>
+#include <linux/of_address.h>
+#include <linux/of_irq.h>
+#endif
+
+#ifdef CONFIG_OF
+static const struct of_device_id strobe_of_ids[] = {
+    {.compatible = "mediatek,mt6580-strobe",},
+    {}
+};
+#endif
+
 static struct platform_driver flashlight_platform_driver = {
 	.probe = flashlight_probe,
 	.remove = flashlight_remove,
@@ -762,28 +777,33 @@ static struct platform_driver flashlight_platform_driver = {
 	.driver = {
 		   .name = FLASHLIGHT_DEVNAME,
 		   .owner = THIS_MODULE,
+#ifdef CONFIG_OF
+           .of_match_table = strobe_of_ids,
+#endif
 		   },
 };
 
+#ifndef CONFIG_OF
 static struct platform_device flashlight_platform_device = {
 	.name = FLASHLIGHT_DEVNAME,
 	.id = 0,
 	.dev = {
 		}
 };
+#endif
 
 static int __init flashlight_init(void)
 {
 	int ret = 0;
-
 	logI("[flashlight_probe] start ~");
 
+#ifndef CONFIG_OF
 	ret = platform_device_register(&flashlight_platform_device);
 	if (ret) {
 		logI("[flashlight_probe] platform_device_register fail ~");
 		return ret;
 	}
-
+#endif
 	ret = platform_driver_register(&flashlight_platform_driver);
 	if (ret) {
 		logI("[flashlight_probe] platform_driver_register fail ~");
