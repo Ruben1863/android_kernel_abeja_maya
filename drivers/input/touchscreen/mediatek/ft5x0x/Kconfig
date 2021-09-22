@@ -6,6 +6,14 @@ if TOUCHSCREEN_MTK_FT5X0X
 config FT5X0X_FIRMWARE
 	string "FT5X0X for Mediatek firmware"
 
+config TPD_PROXIMITY
+	bool "proximity detection function"
+	help
+		Touch screen will detect the screen near or far from human face.
+		Works just like proximity sensor.
+		Say Y here if you want to enable proximity function of touch.
+		If unsure, say N.
+
 config TPD_ROTATE_90
 	bool "ft5x0x for Mediatek package"
 	default n
@@ -82,13 +90,4 @@ config TPD_CUSTOM_CALIBRATION
 
 	To compile this dirver as a module, choose M here: the
 	module will be called.
-
-config HCT_TP_GESTRUE
-	bool "CONFIG_HCT_TP_GESTRUE"
-	default n
-
-config TPD_CLOSE_POWER_IN_SLEEP
-	bool "CONFIG_TPD_CLOSE_POWER_IN_SLEEP"
-	default n
-
 endif
