@@ -20,8 +20,8 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 | Other | `kd_camera_hw (i2c 0-0036)` | Yes | Yes |
 
 ## Known Bugs
-- Hi843b: camera colour is blue.
-- Gc5005: camera sensor have the worst quality I have ever seen.
+- Hi843b: Poor quality and colour a bit yellow (Also just 8mpx)
+- Gc5005: Poor quality (Also just 5mpx)
 - Flashlight.
 - ALS/PS: sensor is unknwon, so for now there isn't light/proximity sensor.
 - Main speaker: its operation is unknown because in my device the speaker died a long time ago.
