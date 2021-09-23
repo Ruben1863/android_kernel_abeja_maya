@@ -7,7 +7,7 @@ extern struct tpd_device *tpd;
 */
 #define TPD_PIN_RST 	(0)
 #define TPD_PIN_EINT 	(1)
-//#define TPD_PROXIMITY
+#define TPD_PROXIMITY
 
 static void ft5x0x_set_rst(bool bSet, int nDelay)
 {
@@ -15,7 +15,7 @@ static void ft5x0x_set_rst(bool bSet, int nDelay)
 	if (nDelay) mdelay(nDelay);
 }
 #ifdef TPD_PROXIMITY
-#include "../../../../misc/mediatek/alsps/inc/alsps.h"
+#include "../../../../misc/mediatek/sensors-1.0/alsps/inc/alsps.h"
 #include <hwmsensor.h>
 #include <hwmsen_dev.h>
 #include <hwmsen_helper.h>
