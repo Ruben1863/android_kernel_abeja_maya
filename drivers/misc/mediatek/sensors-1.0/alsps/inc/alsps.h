@@ -32,11 +32,22 @@
 #include <linux/delay.h>
 #include <linux/module.h>
 #include <linux/poll.h>
-#include <sensors_io.h>
-#include <hwmsensor.h>
+
+//#include <sensors_io.h>
+//#include <hwmsensor.h>
+//#include <hwmsen_dev.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsensor.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsen_dev.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/sensors_io.h>
+
 #include "alsps_factory.h"
-#include "sensor_attr.h"
-#include "sensor_event.h"
+//#include "sensor_attr.h"
+//#include "sensor_event.h"
+
+#include "../../../../misc/mediatek/sensors-1.0/hwmon/include/sensor_attr.h"
+#include "../../../../misc/mediatek/sensors-1.0/hwmon/include/sensor_event.h"
+
+
 #define ALSPS_TAG					"<ALS/PS> "
 #define ALSPS_FUN(f)				pr_debug(ALSPS_TAG"%s\n", __func__)
 #define ALSPS_PR_ERR(fmt, args...)	pr_err(ALSPS_TAG"%s %d : "fmt, __func__, __LINE__, ##args)

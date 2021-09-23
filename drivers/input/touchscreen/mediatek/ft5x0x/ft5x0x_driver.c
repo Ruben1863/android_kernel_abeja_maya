@@ -27,12 +27,12 @@
 #include "ft5x0x_util.h"
 
 
-
 extern struct tpd_device *tpd;
 extern int tpd_v_magnify_x;
 extern int tpd_v_magnify_y;
 
 struct i2c_client *i2c_client = NULL;
+struct hwmsen_object obj_ps;
 
 static int tpd_detect (struct i2c_client *client, struct i2c_board_info *info)
 {
@@ -42,10 +42,12 @@ static int tpd_detect (struct i2c_client *client, struct i2c_board_info *info)
 #define TPD_MAX_RESET_COUNT	3
 static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
+    s32 err_hw = 0;
 	char data;
 	int reset_count;
 	int retval = 0;
 	i2c_client = client;
+//    struct hwmsen_object obj_ps;
 
 	TPD_DMESG("mtk_tpd: tpd_probe ft5x0x \n");
 	for (reset_count = 0; reset_count < TPD_MAX_RESET_COUNT; ++reset_count)
@@ -62,10 +64,10 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 
 			TPD_DMESG("Touch Panel Device Probe %s\n", (retval < 0) ? "FAIL" : "PASS");
 			#ifdef TPD_PROXIMITY
-				struct hwmsen_object obj_ps;
+				
 				obj_ps.polling = 0;	/* 0--interrupt mode;1--polling mode; */
 				obj_ps.sensor_operate = tpd_ps_operate;
-				s32 err_hw = hwmsen_attach(ID_PROXIMITY, &obj_ps);
+				err_hw = hwmsen_attach(ID_PROXIMITY, &obj_ps);
 				if (err_hw)
 					TPD_DEBUG("hwmsen attach fail, return:%d.", err_hw);
 			#endif

@@ -15,10 +15,11 @@ static void ft5x0x_set_rst(bool bSet, int nDelay)
 	if (nDelay) mdelay(nDelay);
 }
 #ifdef TPD_PROXIMITY
-#include "../../../../misc/mediatek/sensors-1.0/alsps/inc/alsps.h"
-#include <hwmsensor.h>
-#include <hwmsen_dev.h>
-#include <hwmsen_helper.h>
+#include <../../../../misc/mediatek/sensors-1.0/alsps/inc/alsps.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsensor.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsen_dev.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsen_helper.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/sensors_io.h>
 #endif
 #ifdef TPD_PROXIMITY
 
@@ -138,8 +139,8 @@ static int tpd_touchinfo(struct i2c_client* i2c_client, struct touch_info *cinfo
 #ifdef TPD_PROXIMITY
 int tpd_read_ps(void)
 {
-	tpd_proximity_detect;
-	return 0;
+//	tpd_proximity_detect;
+	return tpd_proximity_detect;
 }
 
 static int tpd_get_ps_value(void)
