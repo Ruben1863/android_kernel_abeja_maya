@@ -256,8 +256,8 @@ static ssize_t store_tpgesture_status_value(struct device* dev, struct device_at
 	 return count;
 }
 
-static DEVICE_ATTR(tpgesture, 0664, show_tpgesture_value, NULL);
+static DEVICE_ATTR(tpgesture, 0444, show_tpgesture_value, NULL);
 //	0666
-static DEVICE_ATTR(tpgesture_status, 0664, show_tpgesture_status_value, store_tpgesture_status_value);
+static DEVICE_ATTR(tpgesture_status, 0444, show_tpgesture_status_value, store_tpgesture_status_value);
 
 
