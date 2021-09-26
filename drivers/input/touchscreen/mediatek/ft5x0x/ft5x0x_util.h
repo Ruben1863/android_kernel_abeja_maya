@@ -23,11 +23,11 @@ static void ft5x0x_set_rst(bool bSet, int nDelay)
 #endif
 #ifdef TPD_PROXIMITY
 
-#define APS_ERR(fmt,arg...)           	//printk("<<proximity>> "fmt"\n",##arg)
+#define APS_ERR(fmt,arg...)           	printk("<<proximity>> "fmt"\n",##arg)
 
-#define TPD_PROXIMITY_DEBUG(fmt,arg...) //printk("<<proximity>> "fmt"\n",##arg)
+#define TPD_PROXIMITY_DEBUG(fmt,arg...) printk("<<proximity>> "fmt"\n",##arg)
 
-#define TPD_PROXIMITY_DMESG(fmt,arg...) //printk("<<proximity>> "fmt"\n",##arg)
+#define TPD_PROXIMITY_DMESG(fmt,arg...) printk("<<proximity>> "fmt"\n",##arg)
 
 static u8 tpd_proximity_flag 			= 0;
 
