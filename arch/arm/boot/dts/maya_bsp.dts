@@ -130,6 +130,9 @@
 	sd-uhs-sdr25;
 	sd-uhs-sdr50;
 	sd-uhs-sdr104;
+	pinctrl-names = "default","insert_cfg";
+	pinctrl-0 = <&mmc1_pins_insert_default>;
+	pinctrl-1 = <&mmc1_pins_insert_cfg>;
 	pinctl = <&mmc1_pins_default>;
 	pinctl_sdr104 = <&mmc1_pins_sdr104>;
 	pinctl_sdr50 = <&mmc1_pins_sdr50>;
@@ -202,7 +205,18 @@
 			drive-strength = /bits/ 8 <3>;
 		};
 	};
-
+	
+	mmc1_pins_insert_default: mmc1_ins_default {
+	};
+	mmc1_pins_insert_cfg: mmc1_ins_cfg {
+		pins_insert {
+			pins = <PINMUX_GPIO3__FUNC_EINT3>;
+			input-schmitt-enable =<1>;
+			slew-rate = <0>;
+			bias-pull-up =<00>;
+		};
+	};
+	
 	mmc1_pins_sdr104: mmc1@sdr104 {
 		pins_cmd {
 			drive-strength = /bits/ 8 <2>;
