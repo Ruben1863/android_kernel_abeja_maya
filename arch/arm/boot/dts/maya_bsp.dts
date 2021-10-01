@@ -681,7 +681,7 @@
 			pins = <PINMUX_GPIO8__FUNC_GPIO8>;
 			slew-rate = <0>;
 			bias-disable;
-			output-low;
+			output-high;
 		};
 	};
 
@@ -690,7 +690,7 @@
 		pins_cmd_dat {
 			pins = <PINMUX_GPIO8__FUNC_GPIO8>;
 			slew-rate = <1>;
-			output-high;
+			output-low;
 		};
 	};
 
@@ -699,7 +699,7 @@
 		pins_cmd_dat {
 			pins = <PINMUX_GPIO84__FUNC_GPIO84>;
 			slew-rate = <1>;
-			output-low;
+			output-high;
 		};
 	};
 	main_strobe_mode_ol: mainstrobemode@2 {
