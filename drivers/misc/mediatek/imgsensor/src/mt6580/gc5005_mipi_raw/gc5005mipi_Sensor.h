@@ -2,7 +2,7 @@
  *
  * Filename:
  * ---------
- *     GC5005mipi_Sensor.h
+ *     GC5005mipi_Sensor.h 
  *
  * Project:
  * --------
@@ -14,44 +14,40 @@
  *
  ****************************************************************************/
 //#define IMAGE_NORMAL_MIRROR 
-#define IMAGE_H_MIRROR 
+#define IMAGE_H_MIRROR
 //#define IMAGE_V_MIRROR 
 //#define IMAGE_HV_MIRROR 
 
-#ifdef IMAGE_NORMAL
+#ifdef IMAGE_NORMAL_MIRROR
 #define MIRROR 		  0x54
-
-#define BinStartY	     0x02
-#define BinStartX      0x02
-#define FullStartY     0x05
-#define FullStartX     0x05
+#define CAP_STARTX 		  0x04
+#define CAP_STARTY 		  0x04
+#define PV_STARTX 		  0x02
+#define PV_STARTY 		  0x02
 #endif
 
 #ifdef IMAGE_H_MIRROR
 #define MIRROR 		  0x55
-
-#define BinStartY	  	 0x01
-#define BinStartX      0x02
-#define FullStartY     0x03
-#define FullStartX     0x04
+#define CAP_STARTX 		  0x05
+#define CAP_STARTY 		  0x04
+#define PV_STARTX 		  0x03
+#define PV_STARTY 		  0x02
 #endif
 
 #ifdef IMAGE_V_MIRROR
 #define MIRROR 		  0x56
-
-#define BinStartY	     0x02
-#define BinStartX      0x02
-#define FullStartY     0x04
-#define FullStartX     0x05
+#define CAP_STARTX 		  0x04
+#define CAP_STARTY 		  0x05
+#define PV_STARTX 		  0x02
+#define PV_STARTY 		  0x03
 #endif
 
 #ifdef IMAGE_HV_MIRROR
 #define MIRROR  	  0x57
-
-#define BinStartY	     0x02
-#define BinStartX      0x02
-#define FullStartY     0x04
-#define FullStartX     0x04
+#define CAP_STARTX 		  0x03
+#define CAP_STARTY 		  0x03
+#define PV_STARTX 		  0x03
+#define PV_STARTY 		  0x03
 #endif
 #ifndef _GC5005MIPI_SENSOR_H
 #define _GC5005MIPI_SENSOR_H
@@ -158,4 +154,3 @@ extern int iWriteRegI2C(u8 *a_pSendData , u16 a_sizeSendData, u16 i2cId);
 extern int iWriteReg(u16 a_u2Addr , u32 a_u4Data , u32 a_u4Bytes , u16 i2cId); 
 
 #endif
-
