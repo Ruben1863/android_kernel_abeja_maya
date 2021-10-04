@@ -777,7 +777,7 @@
 
 //Configureation for Pin 84
 #define GPIO84_MODE      GPIO_MODE_00
-#define GPIO84_DIR       GPIO_DIR_IN
+#define GPIO84_DIR       GPIO_DIR_OUT
 #define GPIO84_PULLEN    GPIO_PULL_ENABLE
 #define GPIO84_PULL      GPIO_PULL_DOWN
 #define GPIO84_DATAOUT   GPIO_OUT_ZERO

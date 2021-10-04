@@ -50,7 +50,9 @@
 #endif
 #include "kd_flashlight.h"
 
-
+#ifndef CONFIG_OF
+#define CONFIG_OF
+#endif
 
 
 /******************************************************************************

@@ -81,6 +81,9 @@ static DEFINE_MUTEX(g_strobeSem);
 
 #define STROBE_DEVICE_ID 0xC6
 
+#ifndef CONFIG_OF
+#define CONFIG_OF
+#endif
 
 static struct work_struct workTimeOut;
 

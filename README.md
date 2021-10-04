@@ -22,7 +22,6 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 ## Known Bugs
 - Hi843b: Poor quality? (Also just 8mpx)
 - Gc5005: Poor quality? (Also just 5mpx)
-- Flashlight works, but toogle works backwards (On=Off and Off=On). Also in camera app flashlight is ALWAYS on. Not sure if its kernel bug or ROM bug.
 - ALS/PS: sensor is unknwon, so for now there isn't light/proximity sensor.
 - Main speaker: its operation is unknown because in my device the speaker died a long time ago.
 
