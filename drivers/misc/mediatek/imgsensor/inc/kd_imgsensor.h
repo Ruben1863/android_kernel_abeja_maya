@@ -207,6 +207,7 @@
 #define S5K53BEX_SENSOR_ID                      0x45A8
 #define S5K53BEB_SENSOR_ID                      0x87A8
 #define S5K5BAFX_SENSOR_ID                      0x05BA
+#define S5K4E2GX_SENSOR_ID                      0x4e20
 #define S5K5E2YA_SENSOR_ID                      0x5e20
 #define S5K4H5YX_2LANE_SENSOR_ID                0x485B
 #define S5K4H5YC_SENSOR_ID                      0x485B
@@ -216,6 +217,7 @@
 #define S5K8AAYX_SENSOR_ID                      0x08aa
 #define S5K5E8YX_SENSOR_ID                      0x5e80
 /*HI*/
+#define HI843B_SENSOR_ID                        0x0843
 #define HI843_SENSOR_ID                         0x0843
 #define HI841_SENSOR_ID                         0x0841
 #define HI707_SENSOR_ID                         0x00b8
@@ -257,6 +259,8 @@
 #define MT9P017MIPI_SENSOR_ID                   0x4800
 #define MT9T113MIPI_SENSOR_ID                   0x4680
 /*GC*/
+#define GC5005MIPI_SENSOR_ID                    0x5005
+//#define GC5005_SENSOR_ID                        0x5005
 #define GC2365_SENSOR_ID                        0x2365
 #define GC2355_SENSOR_ID                        0x2355
 #define GC2235_SENSOR_ID                        0x2235
@@ -390,11 +394,13 @@
 #define SENSOR_DRVNAME_S5K4ECGX_MIPI_YUV        "s5k4ecgxmipiyuv"
 #define SENSOR_DRVNAME_S5K5CAGX_YUV             "s5k5cagxyuv"
 #define SENSOR_DRVNAME_S5K4H5YX_2LANE_MIPI_RAW  "s5k4h5yx2lanemipiraw"
+#define SENSOR_DRVNAME_S5K4E2GX_MIPI_RAW        "s5k4e2gxmipiraw"
 #define SENSOR_DRVNAME_S5K5E2YA_MIPI_RAW        "s5k5e2yamipiraw"
 #define SENSOR_DRVNAME_S5K8AAYX_MIPI_YUV        "s5k8aayxmipiyuv"
 #define SENSOR_DRVNAME_S5K8AAYX_YUV             "s5k8aayxyuv"
 #define SENSOR_DRVNAME_S5K5E8YX_MIPI_RAW        "s5k5e8yxmipiraw"
 /*HI*/
+#define SENSOR_DRVNAME_HI843B_MIPI_RAW          "hi843bmipiraw"
 #define SENSOR_DRVNAME_HI843_MIPI_RAW           "hi843mipiraw"
 #define SENSOR_DRVNAME_HI841_MIPI_RAW           "hi841mipiraw"
 #define SENSOR_DRVNAME_HI707_YUV                "hi707yuv"
@@ -420,6 +426,7 @@
 #define SENSOR_DRVNAME_MT9V113_YUV              "mt9v113yuv"
 #define SENSOR_DRVNAME_MT9T113_MIPI_YUV         "mt9t113mipiyuv"
 /*GC*/
+#define SENSOR_DRVNAME_GC5005_MIPI_RAW          "gc5005mipiraw"
 #define SENSOR_DRVNAME_GC2035_YUV               "gc2035_yuv"
 #define SENSOR_DRVNAME_GC2235_RAW               "gc2235_raw"
 #define SENSOR_DRVNAME_GC2355_MIPI_RAW          "gc2355mipiraw"

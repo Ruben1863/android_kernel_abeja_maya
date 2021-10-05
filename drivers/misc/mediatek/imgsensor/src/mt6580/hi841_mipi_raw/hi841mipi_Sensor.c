@@ -39,8 +39,8 @@
 #include <linux/uaccess.h>
 #include <linux/fs.h>
 #include <asm/atomic.h>
-#include <asm/system.h>
-#include <linux/xlog.h>
+//#include <asm/system.h>
+//#include <linux/xlog.h>
 
 #include "kd_camera_hw.h"
 #include "kd_imgsensor.h"
@@ -197,7 +197,7 @@ static void write_cmos_sensor(kal_uint32 addr, kal_uint32 para)
 	iWriteRegI2C(pu_send_cmd, 3, imgsensor.i2c_write_id);
 }
 
-static void set_dummy()
+static void set_dummy(void)
 {
 
 
@@ -213,7 +213,6 @@ static void set_dummy()
 
 static void set_max_framerate(UINT16 framerate,kal_bool min_framelength_en)
 {
-	kal_int16 dummy_line;
 	kal_uint32 frame_length = imgsensor.frame_length;
 	//unsigned long flags;
 
@@ -245,7 +244,7 @@ static void write_shutter(kal_uint16 shutter)
 
 	LOG_INF("write_shutter");
 	kal_uint16 realtime_fps = 0;
-	kal_uint32 frame_length = 0;
+//	kal_uint32 frame_length = 0;
 	   
 	/* 0x3500, 0x3501, 0x3502 will increase VBLANK to get exposure larger than frame exposure */
 	/* AE doesn't update sensor gain at capture mode, thus extra exposure lines must be updated here. */
@@ -364,12 +363,12 @@ static kal_uint16 set_gain(kal_uint16 gain)
 	kal_uint16 DigitalGain = 0;
 
 // AG = 256/(B[7:0] + 32)
-	// hi841◊Ó¥Û÷ß≥÷8±∂ƒ£ƒ‚gain,(7 * 255 / 256)±∂ ˝◊÷gain
+	// hi841\D7\EE\B4\F3÷ß\B3\D68\B1\B6ƒ£\C4\E2gain,(7 * 255 / 256)\B1\B6\CA\FD\D7\D6gain
 	if(gain > 4080)  
 	{
 		gain= 4080;
 	}
-	if(gain < 58)  // gainµƒreg◊Ó¥Û÷µ «255
+	if(gain < 58)  // gain\B5\C4reg\D7\EE\B4\F3÷µ\CA\C7255
 	{
 		gain = 58;
 	}
@@ -406,7 +405,7 @@ static kal_uint16 set_gain(kal_uint16 gain)
 		DigitalGain = gain / 2 ;  // DigitalGain = iGain * 256 / 64 / 8
 		write_cmos_sensor(0x0104, 0x1);
 		
-		write_cmos_sensor(0x0205, 0);   // 8±∂ƒ£ƒ‚gain
+		write_cmos_sensor(0x0205, 0);   // 8\B1\B6ƒ£\C4\E2gain
 		write_cmos_sensor(0x020e,(DigitalGain >> 8 ) & 0x7);
 		write_cmos_sensor(0x020f, DigitalGain & 0xff);
 		write_cmos_sensor(0x0210,(DigitalGain >> 8 ) & 0x7);
@@ -458,7 +457,7 @@ static void ihdr_write_shutter_gain(kal_uint16 le, kal_uint16 se, kal_uint16 gai
 
 
 
-
+# if 0
 static void set_mirror_flip(kal_uint8 image_mirror)
 {
 	LOG_INF("image_mirror = %d", image_mirror);
@@ -496,7 +495,7 @@ static void set_mirror_flip(kal_uint8 image_mirror)
 	}
 
 }
-
+# endif
 /*************************************************************************
 * FUNCTION
 *	night_mode
@@ -942,13 +941,13 @@ write_cmos_sensor(0x0807, 0x1F);  // tlpx 84ns
 			// clk pre 90ns                                          
                                                                                              
 write_cmos_sensor(0x0344, 0x00); // x_addr_start_Hi                                               
-write_cmos_sensor(0x0345, 0x28); // x_addr_start_Lo (40, DisplayΩ√ø° 20-23 ¿∫ ¿ﬂ∏Æ∞Ì 24 ∫Œ≈Õ √‚∑¬)
+write_cmos_sensor(0x0345, 0x28); // x_addr_start_Lo (40, Display\BD√ø\A1 20-23 \C0\BA \C0ﬂ∏\AE\B0\ED 24 \BA\CE\C5\CD \C3\E2\B7\C2)
 write_cmos_sensor(0x0346, 0x00); // y_addr_start_Hi                                               
-write_cmos_sensor(0x0347, 0x28); // y_addr_start_Lo (40, DisplayΩ√ø° 22-23 ¿∫ ¿ﬂ∏Æ∞Ì 24 ∫Œ≈Õ √‚∑¬)
+write_cmos_sensor(0x0347, 0x28); // y_addr_start_Lo (40, Display\BD√ø\A1 22-23 \C0\BA \C0ﬂ∏\AE\B0\ED 24 \BA\CE\C5\CD \C3\E2\B7\C2)
 write_cmos_sensor(0x0348, 0x0C); // x_addr_end_Hi                                                 
-write_cmos_sensor(0x0349, 0xE7); // x_addr_end_Lo (3303, DisplayΩ√ø° 3320-3323 ¿∫ ¿ﬂ∏≤)           
+write_cmos_sensor(0x0349, 0xE7); // x_addr_end_Lo (3303, Display\BD√ø\A1 3320-3323 \C0\BA \C0ﬂ∏\B2)           
 write_cmos_sensor(0x034A, 0x09); // y_addr_end_Hi                                                 
-write_cmos_sensor(0x034B, 0xB7); // y_addr_end_Lo (2487, DisplayΩ√ø° 2504-2505 ¿∫ ¿ﬂ∏≤)           
+write_cmos_sensor(0x034B, 0xB7); // y_addr_end_Lo (2487, Display\BD√ø\A1 2504-2505 \C0\BA \C0ﬂ∏\B2)           
                                                                                         
 write_cmos_sensor(0x0307, 0x30);  // pll multiplier                                               
 write_cmos_sensor(0x0900, 0x01);  //  Binning mode enable                                         
@@ -983,13 +982,13 @@ write_cmos_sensor(0x0807, 0x2F);  // tlpx 62ns
                         // tclk_pre 45ns                                                     
                                                                                              
 write_cmos_sensor(0x0344, 0x00); // x_addr_start_Hi                                               
-write_cmos_sensor(0x0345, 0x28); // x_addr_start_Lo (40, DisplayΩ√ø° 20-23 ¿∫ ¿ﬂ∏Æ∞Ì 24 ∫Œ≈Õ √‚∑¬)
+write_cmos_sensor(0x0345, 0x28); // x_addr_start_Lo (40, Display\BD√ø\A1 20-23 \C0\BA \C0ﬂ∏\AE\B0\ED 24 \BA\CE\C5\CD \C3\E2\B7\C2)
 write_cmos_sensor(0x0346, 0x00); // y_addr_start_Hi                                               
-write_cmos_sensor(0x0347, 0x28); // y_addr_start_Lo (40, DisplayΩ√ø° 22-23 ¿∫ ¿ﬂ∏Æ∞Ì 24 ∫Œ≈Õ √‚∑¬)
+write_cmos_sensor(0x0347, 0x28); // y_addr_start_Lo (40, Display\BD√ø\A1 22-23 \C0\BA \C0ﬂ∏\AE\B0\ED 24 \BA\CE\C5\CD \C3\E2\B7\C2)
 write_cmos_sensor(0x0348, 0x0C); // x_addr_end_Hi                                                 
-write_cmos_sensor(0x0349, 0xE7); // x_addr_end_Lo (3303, DisplayΩ√ø° 3320-3323 ¿∫ ¿ﬂ∏≤)           
+write_cmos_sensor(0x0349, 0xE7); // x_addr_end_Lo (3303, Display\BD√ø\A1 3320-3323 \C0\BA \C0ﬂ∏\B2)           
 write_cmos_sensor(0x034A, 0x09); // y_addr_end_Hi                                                 
-write_cmos_sensor(0x034B, 0xB7); // y_addr_end_Lo (2487, DisplayΩ√ø° 2504-2505 ¿∫ ¿ﬂ∏≤)           
+write_cmos_sensor(0x034B, 0xB7); // y_addr_end_Lo (2487, Display\BD√ø\A1 2504-2505 \C0\BA \C0ﬂ∏\B2)           
                                                                                              
 write_cmos_sensor(0x0307, 0x5F);  // pll multiplier                                               
 write_cmos_sensor(0x0900, 0x00);  //  Binning mode enable                                         
@@ -1028,13 +1027,13 @@ write_cmos_sensor(0x0807, 0x2F);  // tlpx 62ns
                       // tclk_pre 46ns                                                   
                                                                                           
 write_cmos_sensor(0x0344, 0x02); // x_addr_start_Hi                                               
-write_cmos_sensor(0x0345, 0xC8); // x_addr_start_Lo (40, DisplayΩ√ø° 20-23 ¿∫ ¿ﬂ∏Æ∞Ì 24 ∫Œ≈Õ √‚∑¬)
+write_cmos_sensor(0x0345, 0xC8); // x_addr_start_Lo (40, Display\BD√ø\A1 20-23 \C0\BA \C0ﬂ∏\AE\B0\ED 24 \BA\CE\C5\CD \C3\E2\B7\C2)
 write_cmos_sensor(0x0346, 0x02); // y_addr_start_Hi                                               
-write_cmos_sensor(0x0347, 0xD4); // y_addr_start_Lo (40, DisplayΩ√ø° 22-23 ¿∫ ¿ﬂ∏Æ∞Ì 24 ∫Œ≈Õ √‚∑¬)
+write_cmos_sensor(0x0347, 0xD4); // y_addr_start_Lo (40, Display\BD√ø\A1 22-23 \C0\BA \C0ﬂ∏\AE\B0\ED 24 \BA\CE\C5\CD \C3\E2\B7\C2)
 write_cmos_sensor(0x0348, 0x0A); // x_addr_end_Hi                                                 
-write_cmos_sensor(0x0349, 0x47); // x_addr_end_Lo (3303, DisplayΩ√ø° 3320-3323 ¿∫ ¿ﬂ∏≤)           
+write_cmos_sensor(0x0349, 0x47); // x_addr_end_Lo (3303, Display\BD√ø\A1 3320-3323 \C0\BA \C0ﬂ∏\B2)           
 write_cmos_sensor(0x034A, 0x07); // y_addr_end_Hi                                                 
-write_cmos_sensor(0x034B, 0x0B); // y_addr_end_Lo (2487, DisplayΩ√ø° 2504-2505 ¿∫ ¿ﬂ∏≤)           
+write_cmos_sensor(0x034B, 0x0B); // y_addr_end_Lo (2487, Display\BD√ø\A1 2504-2505 \C0\BA \C0ﬂ∏\B2)           
                                                                                         
 write_cmos_sensor(0x0307, 0x5f);  // pll multiplier                                               
 write_cmos_sensor(0x0900, 0x00);  //  Binning mode enable                                         
@@ -1054,7 +1053,7 @@ write_cmos_sensor(0x7407, 0x00);
 
 write_cmos_sensor(0x0100, 0x01);  // sleep on        
 }
-static void hs_video_setting()
+static void hs_video_setting(void)
 {
     LOG_INF("E\n");
 //Preview Mode VGA Setting                                                       
@@ -1113,7 +1112,7 @@ write_cmos_sensor(0x7407, 0x04);
 write_cmos_sensor(0x0100, 0x01);   // sleep on                
 }
 
-static void slim_video_setting()
+static void slim_video_setting(void)
 {
     LOG_INF("E\n");
     //@@video_720p_30fps_800Mbps
@@ -1176,9 +1175,9 @@ write_cmos_sensor(0x0100, 0x01);  // sleep on
 static kal_uint32 get_imgsensor_id(UINT32 *sensor_id) 
 {
 
-LOG_INF("[get_imgsensor_id] ");
 	kal_uint8 i = 0;
 	kal_uint8 retry = 2;
+	LOG_INF("[get_imgsensor_id] ");
 	//sensor have two i2c address 0x6c 0x6d & 0x21 0x20, we should detect the module used i2c address
 
 	write_cmos_sensor(0x8408,0x0a);
@@ -1793,7 +1792,7 @@ static kal_uint32 feature_control(MSDK_SENSOR_FEATURE_ENUM feature_id,
     UINT32 *feature_return_para_32=(UINT32 *) feature_para;
     UINT32 *feature_data_32=(UINT32 *) feature_para;
     unsigned long long *feature_data=(unsigned long long *) feature_para;
-    unsigned long long *feature_return_para=(unsigned long long *) feature_para;
+//    unsigned long long *feature_return_para=(unsigned long long *) feature_para;
 
     SENSOR_WINSIZE_INFO_STRUCT *wininfo;
     MSDK_SENSOR_REG_INFO_STRUCT *sensor_reg_data=(MSDK_SENSOR_REG_INFO_STRUCT *) feature_para;
