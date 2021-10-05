@@ -33,6 +33,12 @@ config MTK_HYBRID_CPU_DVFS
 	  If CONFIG_HYBRID_CPU_DVFS is defined, CPUHVFS driver will bring up
 	  DVFS processor to do CPU DVFS.
 
+config CPU_UC
+	bool "CPU_UNDERCLOCK"
+	default n
+	help
+	  Underclock MT6580 to 260 MHz
+
 config MTK_SPM_USE_EXT_BUCK
 	bool "MTK SPM use ext buck"
 	default n

@@ -111,8 +111,13 @@
 #define CPU_DVFS_FREQ5   (903500) /* KHz */	/* 1.807/2 */
 #define CPU_DVFS_FREQ6   (754000) /* KHz */	/* 1.508/2 */
 #define CPU_DVFS_FREQ7   (604500) /* KHz */	/* 1.209/2 */
-
+#ifdef CONFIG_CPU_UC
+#define CPU_DVFS_FREQ8   (403000)	/* KHz */
+#define CPU_DVFS_FREQ9   (260000)	/* KHz */
+#define CPUFREQ_LAST_FREQ_LEVEL    (CPU_DVFS_FREQ9)
+#else
 #define CPUFREQ_LAST_FREQ_LEVEL    (CPU_DVFS_FREQ7)
+#endif
 
 /*
  * LOG and Test
@@ -650,6 +655,10 @@ static struct mt_cpu_freq_info opp_tbl_e1_0[] = {
 	OP(CPU_DVFS_FREQ6, 115000),
 	OP(CPU_DVFS_FREQ7, 115000),
 	OP(CPU_DVFS_FREQ7, 115000),
+#ifdef CONFIG_CPU_UC
+	OP(CPU_DVFS_FREQ8, 105000), /*  403 */
+	OP(CPU_DVFS_FREQ9, 100000), /*  260 */
+#endif
 };
 
 /* CPU LEVEL 1, 1.5GHz segment */
@@ -681,6 +690,10 @@ static struct opp_tbl_info opp_tbls[] = {
 #define PLL_DIV1_1508_FREQ		(1508000)	/* for 750MHz */
 #define PLL_DIV1_1495_FREQ		(1495000)	/* for 1.5G */
 #define PLL_DIV1_1209_FREQ		(1209000)	/* for 1.2G & 600MHz */
+#ifdef CONFIG_CPU_UC
+#define DDS_DIV1_910_FREQ		(0x0008C000)	/* 910MHz */
+#define DDS_DIV1_520_FREQ		(0x00050000)	/* 520MHz */
+#endif
 #define PLL_DIV1_1001_FREQ		(1001000)	/* for 1G - low */
 #define PLL_DIV1_1000_FREQ		(1000000)	/* for 1G - low */
 #define PLL_DIV2_FREQ			(520000)	/* KHz */
@@ -689,6 +702,10 @@ static struct opp_tbl_info opp_tbls[] = {
 #define DDS_DIV1_1508_FREQ		(0x000E8000)	/* 1508MHz */
 #define DDS_DIV1_1495_FREQ		(0x000E6000)	/* 1495MHz */
 #define DDS_DIV1_1209_FREQ		(0x000BA000)	/* 1209MHz */
+#ifdef CONFIG_CPU_UC
+#define DDS_DIV1_910_FREQ		(0x0008C000)	/* 910MHz */
+#define DDS_DIV1_520_FREQ		(0x00050000)	/* 520MHz */
+#endif
 #define DDS_DIV1_1001_FREQ		(0x0009A000)	/* 1001MHz */
 #define DDS_DIV1_FREQ			(0x0009A000)	/* 1001MHz */
 #define DDS_DIV2_FREQ			(0x010A0000)	/* 520MHz  */
@@ -1118,6 +1135,17 @@ unsigned int ckdiv1_mask = _BITMASK_(4:0);
 			dds = _cpu_dds_calc(1209000);	/* 604 = 1209 / 2 */
 			sel = 10;	/* 2/4 */
 			break;
+#ifdef CONFIG_CPU_UC
+		case CPU_DVFS_FREQ8:
+			dds = _cpu_dds_calc(910000);	/* 455 = 910 / 2 */
+			sel = 10;	/* 2/4 */
+			break;
+
+		case CPU_DVFS_FREQ9:
+			dds = _cpu_dds_calc(520000);	/* 260 = 520 / 2 */
+			sel = 10;	/* 2/4 */
+			break;
+#endif
 
 		default:
 			BUG();
