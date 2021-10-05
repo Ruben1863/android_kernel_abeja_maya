@@ -39,6 +39,13 @@ config CPU_UC
 	help
 	  Underclock MT6580 to 260 MHz
 
+config GPU_OC
+	bool "GPU_OVERCLOCK"
+	default n
+	help
+	  This overcloc MT6580 GPU to 600 MHz
+	  and also underclock it to 90 MHz
+
 config MTK_SPM_USE_EXT_BUCK
 	bool "MTK SPM use ext buck"
 	default n
