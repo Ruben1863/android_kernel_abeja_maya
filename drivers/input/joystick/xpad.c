@@ -182,6 +182,12 @@ static const struct xpad_device {
 	{ 0x0f30, 0x0202, "Joytech Advanced Controller", 0, XTYPE_XBOX },
 	{ 0x0f30, 0x8888, "BigBen XBMiniPad Controller", 0, XTYPE_XBOX },
 	{ 0x102c, 0xff0c, "Joytech Wireless Advanced Controller", 0, XTYPE_XBOX },
+<<<<<<< HEAD
+=======
+	{ 0x1038, 0x1430, "SteelSeries Stratus Duo", 0, XTYPE_XBOX360 },
+	{ 0x1038, 0x1431, "SteelSeries Stratus Duo", 0, XTYPE_XBOX360 },
+	{ 0x11c9, 0x55f0, "Nacon GC-100XF", 0, XTYPE_XBOX360 },
+>>>>>>> bed3eaf... Input: xpad - add support for SteelSeries Stratus Duo
 	{ 0x12ab, 0x0004, "Honey Bee Xbox360 dancepad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX360 },
 	{ 0x12ab, 0x0301, "PDP AFTERGLOW AX.1", 0, XTYPE_XBOX360 },
 	{ 0x12ab, 0x8809, "Xbox DDR dancepad", MAP_DPAD_TO_BUTTONS, XTYPE_XBOX },
@@ -303,6 +309,14 @@ static struct usb_device_id xpad_table[] = {
 	XPAD_XBOX360_VENDOR(0x0738),		/* Mad Catz X-Box 360 controllers */
 	{ USB_DEVICE(0x0738, 0x4540) },		/* Mad Catz Beat Pad */
 	XPAD_XBOX360_VENDOR(0x0e6f),		/* 0x0e6f X-Box 360 controllers */
+<<<<<<< HEAD
+=======
+	XPAD_XBOXONE_VENDOR(0x0e6f),		/* 0x0e6f X-Box One controllers */
+	XPAD_XBOX360_VENDOR(0x0f0d),		/* Hori Controllers */
+	XPAD_XBOXONE_VENDOR(0x0f0d),		/* Hori Controllers */
+	XPAD_XBOX360_VENDOR(0x1038),		/* SteelSeries Controllers */
+	XPAD_XBOX360_VENDOR(0x11c9),		/* Nacon GC100XF */
+>>>>>>> bed3eaf... Input: xpad - add support for SteelSeries Stratus Duo
 	XPAD_XBOX360_VENDOR(0x12ab),		/* X-Box 360 dance pads */
 	XPAD_XBOX360_VENDOR(0x1430),		/* RedOctane X-Box 360 controllers */
 	XPAD_XBOX360_VENDOR(0x146b),		/* BigBen Interactive Controllers */
@@ -319,6 +333,114 @@ static struct usb_device_id xpad_table[] = {
 
 MODULE_DEVICE_TABLE(usb, xpad_table);
 
+<<<<<<< HEAD
+=======
+struct xboxone_init_packet {
+	u16 idVendor;
+	u16 idProduct;
+	const u8 *data;
+	u8 len;
+};
+
+#define XBOXONE_INIT_PKT(_vid, _pid, _data)		\
+	{						\
+		.idVendor	= (_vid),		\
+		.idProduct	= (_pid),		\
+		.data		= (_data),		\
+		.len		= ARRAY_SIZE(_data),	\
+	}
+
+
+/*
+ * This packet is required for all Xbox One pads with 2015
+ * or later firmware installed (or present from the factory).
+ */
+static const u8 xboxone_fw2015_init[] = {
+	0x05, 0x20, 0x00, 0x01, 0x00
+};
+
+/*
+ * This packet is required for the Titanfall 2 Xbox One pads
+ * (0x0e6f:0x0165) to finish initialization and for Hori pads
+ * (0x0f0d:0x0067) to make the analog sticks work.
+ */
+static const u8 xboxone_hori_init[] = {
+	0x01, 0x20, 0x00, 0x09, 0x00, 0x04, 0x20, 0x3a,
+	0x00, 0x00, 0x00, 0x80, 0x00
+};
+
+/*
+ * This packet is required for most (all?) of the PDP pads to start
+ * sending input reports. These pads include: (0x0e6f:0x02ab),
+ * (0x0e6f:0x02a4), (0x0e6f:0x02a6).
+ */
+static const u8 xboxone_pdp_init1[] = {
+	0x0a, 0x20, 0x00, 0x03, 0x00, 0x01, 0x14
+};
+
+/*
+ * This packet is required for most (all?) of the PDP pads to start
+ * sending input reports. These pads include: (0x0e6f:0x02ab),
+ * (0x0e6f:0x02a4), (0x0e6f:0x02a6).
+ */
+static const u8 xboxone_pdp_init2[] = {
+	0x06, 0x20, 0x00, 0x02, 0x01, 0x00
+};
+
+/*
+ * A specific rumble packet is required for some PowerA pads to start
+ * sending input reports. One of those pads is (0x24c6:0x543a).
+ */
+static const u8 xboxone_rumblebegin_init[] = {
+	0x09, 0x00, 0x00, 0x09, 0x00, 0x0F, 0x00, 0x00,
+	0x1D, 0x1D, 0xFF, 0x00, 0x00
+};
+
+/*
+ * A rumble packet with zero FF intensity will immediately
+ * terminate the rumbling required to init PowerA pads.
+ * This should happen fast enough that the motors don't
+ * spin up to enough speed to actually vibrate the gamepad.
+ */
+static const u8 xboxone_rumbleend_init[] = {
+	0x09, 0x00, 0x00, 0x09, 0x00, 0x0F, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+/*
+ * This specifies the selection of init packets that a gamepad
+ * will be sent on init *and* the order in which they will be
+ * sent. The correct sequence number will be added when the
+ * packet is going to be sent.
+ */
+static const struct xboxone_init_packet xboxone_init_packets[] = {
+	XBOXONE_INIT_PKT(0x0e6f, 0x0165, xboxone_hori_init),
+	XBOXONE_INIT_PKT(0x0f0d, 0x0067, xboxone_hori_init),
+	XBOXONE_INIT_PKT(0x0000, 0x0000, xboxone_fw2015_init),
+	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_init1),
+	XBOXONE_INIT_PKT(0x0e6f, 0x0000, xboxone_pdp_init2),
+	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumblebegin_init),
+	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumblebegin_init),
+	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumblebegin_init),
+	XBOXONE_INIT_PKT(0x24c6, 0x541a, xboxone_rumbleend_init),
+	XBOXONE_INIT_PKT(0x24c6, 0x542a, xboxone_rumbleend_init),
+	XBOXONE_INIT_PKT(0x24c6, 0x543a, xboxone_rumbleend_init),
+};
+
+struct xpad_output_packet {
+	u8 data[XPAD_PKT_LEN];
+	u8 len;
+	bool pending;
+};
+
+#define XPAD_OUT_CMD_IDX	0
+#define XPAD_OUT_FF_IDX		1
+#define XPAD_OUT_LED_IDX	(1 + IS_ENABLED(CONFIG_JOYSTICK_XPAD_FF))
+#define XPAD_NUM_OUT_PACKETS	(1 + \
+				 IS_ENABLED(CONFIG_JOYSTICK_XPAD_FF) + \
+				 IS_ENABLED(CONFIG_JOYSTICK_XPAD_LEDS))
+
+>>>>>>> 10373f9... Input: xpad - quirk all PDP Xbox One gamepads
 struct usb_xpad {
 	struct input_dev *dev;		/* input device interface */
 	struct usb_device *udev;	/* usb device */
