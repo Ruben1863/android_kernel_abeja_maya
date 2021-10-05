@@ -27,7 +27,7 @@ endif
 ifeq ($(wildcard $(TARGET_PREBUILT_KERNEL)),)
 # .config cannot be PHONY due to config_data.gz
 $(TARGET_KERNEL_CONFIG): $(KERNEL_CONFIG_FILE) $(LOCAL_PATH)/Android.mk
-$(TARGET_KERNEL_CONFIG): $(shell find $(KERNEL_DIR) -name "Kconfig*")
+$(TARGET_KERNEL_CONFIG): $(shell find $(KERNEL_DIR) -name ".config")
 	$(hide) mkdir -p $(dir $@)
 	$(MAKE) -C $(KERNEL_DIR) $(KERNEL_MAKE_OPTION) $(KERNEL_DEFCONFIG)
 
