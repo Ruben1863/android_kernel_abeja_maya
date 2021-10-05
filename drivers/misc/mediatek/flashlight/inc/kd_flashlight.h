@@ -238,6 +238,7 @@ int mt6332_OpenBoost4Flash(void);
 int mt6332_CloseBoost4Flash(void);
 
 /* GPIO pinctrl */
+int strobe_gpio_init(struct platform_device *pdev);
 int flashlight_gpio_init(struct platform_device *pdev);
 int flashlight_gpio_set(int pin, int state);
 int flashlight_gpio_hwen_high(void);

@@ -81,6 +81,9 @@ static DEFINE_MUTEX(g_strobeSem);
 
 #define STROBE_DEVICE_ID 0xC6
 
+#ifndef CONFIG_OF
+#define CONFIG_OF
+#endif
 
 static struct work_struct workTimeOut;
 
@@ -265,8 +268,126 @@ int readReg(int reg)
 	return (int)val;
 }
 
+// add by ruben1863
+#ifndef CONFIG_KST_REAL_FLASH_MODE
+#define CONFIG_KST_REAL_FLASH_MODE // just for sure
+#endif
+struct pinctrl *strobectrl = NULL;
+struct pinctrl_state *main_strobe_oh = NULL;
+struct pinctrl_state *main_strobe_ol = NULL;
+#ifdef CONFIG_KST_REAL_FLASH_MODE
+struct pinctrl_state *main_strobe_mode_oh = NULL;
+struct pinctrl_state *main_strobe_mode_ol = NULL;
+#endif
+static DEFINE_MUTEX(main_strobe_gpio_mutex);
+int strobe_gpio_init(struct platform_device *pdev)
+{
+    int ret = 0;
+
+		strobectrl = devm_pinctrl_get(&pdev->dev);
+		if (IS_ERR(strobectrl)) {
+			dev_err(&pdev->dev, "Cannot find strobe pinctrl!");
+			ret = PTR_ERR(strobectrl);
+		}
+
+		main_strobe_oh = pinctrl_lookup_state(strobectrl, "main_strobe_oh");
+		if (IS_ERR(main_strobe_oh)) {
+			ret = PTR_ERR(main_strobe_oh);
+			pr_debug("%s : pinctrl err, main_strobe_oh\n", __func__);
+		}
+		
+		main_strobe_ol = pinctrl_lookup_state(strobectrl, "main_strobe_ol");
+		if (IS_ERR(main_strobe_ol)) {
+			ret = PTR_ERR(main_strobe_ol);
+			pr_debug("%s : pinctrl err, main_strobe_ol\n", __func__);
+		}
+#ifdef CONFIG_KST_REAL_FLASH_MODE
+		main_strobe_mode_oh = pinctrl_lookup_state(strobectrl, "main_strobe_mode_oh");
+		if (IS_ERR(main_strobe_mode_oh)) {
+			ret = PTR_ERR(main_strobe_mode_oh);
+			pr_debug("%s : pinctrl err, main_strobe_mode_oh\n", __func__);
+		}
+		main_strobe_mode_ol = pinctrl_lookup_state(strobectrl, "main_strobe_mode_ol");
+		if (IS_ERR(main_strobe_mode_ol)) {
+			ret = PTR_ERR(main_strobe_mode_ol);
+			pr_debug("%s : pinctrl err, main_strobe_mode_ol\n", __func__);
+		}
+#endif
+
+		return ret;
+	}
+
+	void strobe_gpio_set(int level)
+	{
+		mutex_lock(&main_strobe_gpio_mutex);
+		if (level == 0)
+			pinctrl_select_state(strobectrl, main_strobe_ol);
+		else
+			pinctrl_select_state(strobectrl, main_strobe_oh);
+		mutex_unlock(&main_strobe_gpio_mutex);
+	}
+
+#ifdef CONFIG_KST_REAL_FLASH_MODE
+	void strobe_mode_gpio_set(int level)
+	{
+		mutex_lock(&main_strobe_gpio_mutex);
+		if (level == 0)
+			pinctrl_select_state(strobectrl, main_strobe_mode_ol);
+		else
+			pinctrl_select_state(strobectrl, main_strobe_mode_oh);
+		mutex_unlock(&main_strobe_gpio_mutex);
+	}
+#endif
+
+#ifdef CONFIG_KST_REAL_FLASH_MODE
+#define LEDS_TORCH_MODE 		0
+#define LEDS_FLASH_MODE 		1
+#define LEDS_CUSTOM_MODE_THRES 	0
+		static int flash_mode_pin = 0;
+#ifdef EN_PWM_CTRL
+			static int g_timePWMOutTimeMs=0;
+			static struct hrtimer g_timePWMOutTimer;
+			void timerPWMInit(void);
+			static bool g_enble_led=false;
+			ktime_t ktime;
+			enum hrtimer_restart ledPWMTimeOutCallback(struct hrtimer *timer)
+			{    
+				if(g_enble_led == true) {
+					strobe_gpio_set(0);
+#ifdef CONFIG_KST_FLASHLIGHT_CURRENT_DOWN
+					g_timePWMOutTimeMs=9;
+#else
+					g_timePWMOutTimeMs=2;
+#endif
+					ktime = ktime_set( 0, g_timePWMOutTimeMs*1000000 ); //1s
+					g_enble_led = false;
+				}
+				else if(g_enble_led == false) {
+					strobe_gpio_set(1);
+#ifdef CONFIG_KST_FLASHLIGHT_CURRENT_DOWN
+					g_timePWMOutTimeMs=1;
+#else
+					g_timePWMOutTimeMs=8;
+#endif
+					ktime = ktime_set( 0, g_timePWMOutTimeMs*1000000 ); //1s
+					g_enble_led = true;
+				}
+				hrtimer_forward(&g_timePWMOutTimer, g_timePWMOutTimer.base->get_time(), ktime);
+				return HRTIMER_RESTART;
+			}
+			void timerPWMInit(void)
+			{
+				g_timePWMOutTimeMs=5;
+				hrtimer_init( &g_timePWMOutTimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL );
+				g_timePWMOutTimer.function=ledPWMTimeOutCallback;
+			}
+#endif
+#endif
+// end
+
 int FL_Enable(void)
 {
+#if 0 // add by ruben1863
 	char buf[2];
 /* char bufR[2]; */
 	if (g_duty < 0)
@@ -323,7 +444,16 @@ int FL_Enable(void)
 	readReg(9);
 	readReg(0xa);
 	readReg(0xb);
-
+	#else
+		strobe_gpio_set(1);
+		
+#ifdef EN_PWM_CTRL   
+			ktime = ktime_set( 0, g_timePWMOutTimeMs*1000000 ); //1s
+			hrtimer_start( &g_timePWMOutTimer, ktime, HRTIMER_MODE_REL );
+			g_enble_led=true;
+#endif
+		
+#endif // end 
 	return 0;
 }
 
@@ -331,6 +461,7 @@ int FL_Enable(void)
 
 int FL_Disable(void)
 {
+#if 0
 	char buf[2];
 
 /* ///////////////////// */
@@ -339,6 +470,13 @@ int FL_Disable(void)
 	/* iWriteRegI2C(buf , 2, STROBE_DEVICE_ID); */
 	LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
 	PK_DBG(" FL_Disable line=%d\n", __LINE__);
+	#else
+#ifdef EN_PWM_CTRL
+			hrtimer_cancel( &g_timePWMOutTimer );
+			g_enble_led=false;	
+#endif
+		strobe_gpio_set(0);
+#endif
 	return 0;
 }
 
@@ -346,6 +484,25 @@ int FL_dim_duty(kal_uint32 duty)
 {
 	PK_DBG(" FL_dim_duty line=%d\n", __LINE__);
 	g_duty = duty;
+#ifdef CONFIG_KST_REAL_FLASH_MODE
+		PK_DBG("FL_dim_duty %d, thres %d", duty, LEDS_CUSTOM_MODE_THRES);
+		
+		flash_mode_pin = 0;
+		if(duty < LEDS_CUSTOM_MODE_THRES)
+			strobe_mode_gpio_set(LEDS_TORCH_MODE);
+		else {
+			flash_mode_pin = 1;
+			strobe_mode_gpio_set(LEDS_FLASH_MODE);
+		}
+
+		if((g_timeOutTimeMs == 0) && (duty > LEDS_CUSTOM_MODE_THRES))
+		{
+			PK_DBG("FL_dim_duty %d > thres %d, FLASH mode but timeout %d", duty, LEDS_CUSTOM_MODE_THRES, g_timeOutTimeMs);
+			strobe_mode_gpio_set(LEDS_TORCH_MODE);
+			flash_mode_pin = 0;
+		}
+#endif
+
 	return 0;
 }
 
@@ -402,6 +559,9 @@ int FL_Init(void)
 
 
 /*	PK_DBG(" FL_Init line=%d\n", __LINE__); */
+#ifdef EN_PWM_CTRL
+	timerPWMInit();
+#endif
 	return 0;
 }
 
