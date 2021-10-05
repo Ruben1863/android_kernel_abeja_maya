@@ -28,9 +28,14 @@
 #include <linux/types.h>
 #include <linux/atomic.h>
 
-#include <hwmsensor.h>
-#include <sensors_io.h>
-#include <hwmsen_helper.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsensor.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsen_dev.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/sensors_io.h>
+#include <../../../../misc/mediatek/sensors-1.0/hwmon/include/hwmsen_helper.h>
+
+//#include <hwmsensor.h>
+//#include <sensors_io.h>
+//#include <hwmsen_helper.h>
 
 /*#include <mach/mt_typedefs.h>*/
 /*#include <mach/mt_gpio.h>*/
