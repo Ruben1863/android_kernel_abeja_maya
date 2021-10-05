@@ -452,7 +452,7 @@ source "drivers/misc/mediatek/pd/Kconfig"
 
 config MTK_DM_VERITY_OFF
 	bool "Disable dm-verity"
-	default n
+	default y
 
 endmenu    # Misc
 
