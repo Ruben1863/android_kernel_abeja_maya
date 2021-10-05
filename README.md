@@ -39,3 +39,8 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 * [@raymondmiracle](https://github.com/raymondmiracle)
 * [@hsagent](https://github.com/hsagent)
 * [@0xXA](https://github.com/0xXA)
+
+## How to build it?
+```
+chmod a+x Build && ./Build
+```
