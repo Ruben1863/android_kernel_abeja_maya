@@ -1,9 +1,9 @@
 /*
  *
- * svbFocalTech TouchScreen driver.
+ 
+ * FocalTech TouchScreen driver.
  *
  * Copyright (c) 2010-2017, FocalTech Systems, Ltd., all rights reserved.
- * Copyright (c) 2020, svoboda18
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -15,6 +15,19 @@
  * GNU General Public License for more details.
  *
  */
+/*****************************************************************************
+*
+* File Name: focaltech_core.c
+*
+* Author: Focaltech Driver Team
+*
+* Created: 2016-08-08
+*
+* Abstract: entrance for focaltech ts driver
+*
+* Version: V1.0
+*
+*****************************************************************************/
 
 /*****************************************************************************
 * Included header files
@@ -24,20 +37,35 @@
 #include <linux/of_device.h>
 #include <linux/of_gpio.h>
 #include <linux/of_irq.h>
-#include "svbfocaltech_core.h"
+#ifdef CONFIG_HAS_EARLYSUSPEND
+#include <linux/earlysuspend.h>
+#endif
+//#include <linux/wakelock.h>
+#include "focaltech_core.h"
 
 /*****************************************************************************
 * Private constant and macro definitions using #define
 *****************************************************************************/
 
+//add by cassy begin
+//#define CONFIG_MTK_POWER
+/*
+#define GTP_enable_power_PORT 2//add by cassy
+struct pinctrl *pinctrl3;
+struct pinctrl_state *focal_power_output1,*focal_power_output0;
+static void tpd_power_on(int flag);
+*/
+//add by cassy end
+
+#define FTS_DRIVER_NAME                     "fts_ts"
 #define INTERVAL_READ_REG                   100  //interval time per read reg unit:ms
 #define TIMEOUT_READ_REG                    1000 //timeout of read reg unit:ms
+#define FTS_I2C_SLAVE_ADDR                  0x38
 
 static DECLARE_WAIT_QUEUE_HEAD(waiter);
 static int tpd_flag;
-unsigned int tpd_gesture_status = DISABLE; // "1" is enable
-unsigned int tpd_rst_gpio_number = DISABLE;
-unsigned int tpd_int_gpio_number = ENABLE;
+unsigned int tpd_rst_gpio_number = 0;
+unsigned int tpd_int_gpio_number = 1;
 
 #if (defined(CONFIG_TPD_HAVE_CALIBRATION) && !defined(CONFIG_TPD_CUSTOM_CALIBRATION))
 static int tpd_def_calmat_local_normal[8]  = TPD_CALIBRATION_MATRIX_ROTATION_NORMAL;
@@ -93,14 +121,15 @@ int fts_wait_tp_to_valid(struct i2c_client *client)
     int ret = 0;
     int cnt = 0;
     u8 reg_value = 0;
+    u8 chip_id = fts_data->ic_info.ids.chip_idh;
 
     do {
-        ret = fts_i2c_read_reg(client, FTS_REG_WORKMODE_WORK_VALUE, &reg_value);
-        if (ret >= 0) {
-            FTS_INFO("TP Ready, ReadData = 0x%x", reg_value);
+        ret = fts_i2c_read_reg(client, FTS_REG_CHIP_ID, &reg_value);
+        if ((ret < 0) || (reg_value != chip_id)) {
+            FTS_DEBUG("TP Not Ready, ReadData = 0x%x", reg_value);
+        } else if (reg_value == chip_id) {
+            FTS_INFO("TP Ready, Device ID = 0x%x", reg_value);
             return 0;
-        } else {
-            FTS_DEBUG("TP Not Ready, ReadData = 0x%x", reg_value);      
         }
         cnt++;
         msleep(INTERVAL_READ_REG);
@@ -120,12 +149,16 @@ void fts_tp_state_recovery(struct i2c_client *client)
 {
     /* wait tp stable */
     fts_wait_tp_to_valid(client);
+    /* recover TP charger state 0x8B */
+    /* recover TP glove state 0xC0 */
+    /* recover TP cover state 0xC1 */
+#if FTS_PSENSOR_EN
+    fts_proximity_recovery(client);
+#endif
 
     /* recover TP gesture state 0xD0 */
 #if FTS_GESTURE_EN
-    if (tpd_gesture_status) {
-    	fts_gesture_recovery(client);
-    }
+    fts_gesture_recovery(client);
 #endif
 }
 
@@ -205,9 +238,13 @@ int fts_power_init(void)
 {
 
     int ret;
-    /* set TP volt */
+    /*set TP volt*/
     tpd->reg = regulator_get(tpd->tpd_dev, "vtouch");
-    regulator_set_voltage(tpd->reg, 2800000, 2800000);
+    ret = regulator_set_voltage(tpd->reg, 2800000, 2800000);
+    if (ret != 0) {
+        FTS_ERROR("[POWER]Failed to set voltage of regulator,ret=%d!", ret);
+        return ret;
+    }
 
     ret = regulator_enable(tpd->reg);
     if (ret != 0) {
@@ -495,16 +532,6 @@ static int fts_read_touchdata(struct fts_ts_data *data)
         return ret;
     }
     data->point_num = buf[FTS_TOUCH_POINT_NUM] & 0x0F;
-
-    if (data->suspended) {
-        if ((data->point_num == 0x0F) && (buf[1] == 0xFF) && (buf[2] == 0xFF)
-            && (buf[3] == 0xFF) && (buf[4] == 0xFF) && (buf[5] == 0xFF) && (buf[6] == 0xFF)) {
-            FTS_INFO("touch buff is 0xff, need recovery state");
-            fts_tp_state_recovery(data->client);
-            return -EIO;
-        }
-    }
-
     if (data->point_num > max_touch_num) {
         FTS_INFO("invalid point_num(%d)", data->point_num);
         return -EIO;
@@ -613,14 +640,24 @@ static int touch_event_handler(void *unused)
         set_current_state(TASK_RUNNING);
 
         FTS_DEBUG("touch_event_handler start");
+#if FTS_PSENSOR_EN
+        if (fts_proximity_readdata(ts_data->client) == 0)
+            continue;
+#endif
 
 #if FTS_GESTURE_EN
-        if (tpd_gesture_status) {
-		if (0 == fts_gesture_readdata(ts_data)) {
-			FTS_INFO("succuss to get gesture data in irq handler");
-            		continue;
-		}
+        if (0 == fts_gesture_readdata(ts_data)) {
+            FTS_INFO("succuss to get gesture data in irq handler");
+            continue;
         }
+#endif
+
+#if FTS_POINT_REPORT_CHECK_EN
+        fts_prc_queue_work(ts_data);
+#endif
+
+#if FTS_ESDCHECK_EN
+        fts_esdcheck_set_intr(1);
 #endif
 
         ret = fts_read_touchdata(ts_data);
@@ -638,6 +675,9 @@ static int touch_event_handler(void *unused)
         }
 #endif
 
+#if FTS_ESDCHECK_EN
+        fts_esdcheck_set_intr(0);
+#endif
     } while (!kthread_should_stop());
 
     return 0;
@@ -672,6 +712,7 @@ static int fts_input_init(struct fts_ts_data *ts_data)
 
     ts_data->events = (struct ts_event *)kzalloc(point_num * sizeof(struct ts_event), GFP_KERNEL);
     if (!ts_data->events) {
+
         FTS_ERROR("failed to alloc memory for point events!");
         ret = -ENOMEM;
         goto err_event_buf;
@@ -710,6 +751,39 @@ static int tpd_i2c_detect(struct i2c_client *client, struct i2c_board_info *info
 * Output:
 * Return:
 ***********************************************************************/
+	//add by cassy begin
+/*	int tpd_get_gpio_info_focal(struct i2c_client *pdev)
+	{
+		int ret;
+	
+		
+		pinctrl3 = devm_pinctrl_get(&pdev->dev);
+		if (IS_ERR(pinctrl3)) {
+			ret = PTR_ERR(pinctrl3);
+		
+			return ret;
+		}
+			focal_power_output0 = pinctrl_lookup_state(pinctrl3, "state_focal_power_output0");
+			if (IS_ERR(focal_power_output0)) {
+				ret = PTR_ERR(focal_power_output0);
+				return ret;
+			}
+			else
+				{
+				//printk("success\n");
+				}
+			focal_power_output1 = pinctrl_lookup_state(pinctrl3, "state_focal_power_output1");
+			if (IS_ERR(focal_power_output1)) {
+				ret = PTR_ERR(focal_power_output1);
+				return ret;
+			}
+		
+		return 0;
+	}
+*/	
+	
+	//add by cassy end
+
 static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
     int ret = 0;
@@ -726,6 +800,11 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
     ts_data->client = client;
     ts_data->input_dev = tpd->dev;
 
+    if (client->addr != FTS_I2C_SLAVE_ADDR) {
+        FTS_INFO("[TPD]Change i2c addr 0x%02x to %x", client->addr, FTS_I2C_SLAVE_ADDR);
+        client->addr = FTS_I2C_SLAVE_ADDR;
+        FTS_INFO("[TPD]i2c addr=0x%x\n", client->addr);
+    }
     ts_data->ts_workqueue = create_singlethread_workqueue("fts_wq");
     if (NULL == ts_data->ts_workqueue) {
         FTS_ERROR("failed to create fts workqueue");
@@ -733,25 +812,27 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	
     spin_lock_init(&ts_data->irq_lock);
     mutex_init(&ts_data->report_mutex);
-
-    /* init I2C */
+    /* Init I2C */
     fts_i2c_init();
-
-    ret = fts_input_init(ts_data);
+	    ret = fts_input_init(ts_data);
     if (ret) {
         FTS_ERROR("fts input initialize fail");
-	    goto err_input_init;
+        goto err_input_init;
     }
 
-    fts_reset_proc(200);
+  fts_reset_proc(200);
 
-#if FTS_GESTURE_EN
+#if FTS_GESTURE_EN////0
     ret = fts_gesture_init(ts_data);
     if (ret) {
         FTS_ERROR("init gesture fail");
     }
 #endif
 
+#if FTS_PSENSOR_EN///0
+    fts_proximity_init(client);
+#endif
+	
     ts_data->thread_tpd = kthread_run(touch_event_handler, 0, TPD_DEVICE);
     if (IS_ERR(ts_data->thread_tpd)) {
         ret = PTR_ERR(ts_data->thread_tpd);
@@ -761,6 +842,7 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
     }
 
     FTS_DEBUG("[TPD]Touch Panel Device Probe %s!", (ret < 0) ? "FAIL" : "PASS");
+	
 
     /* Configure gpio to irq and request irq */
     tpd_gpio_as_int(tpd_int_gpio_number);
@@ -771,6 +853,7 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
     }
 
     tpd_load_status = 1;
+    FTS_DEBUG("TPD_RES_Y:%d", (int)TPD_RES_Y);
     FTS_FUNC_EXIT();
     return 0;
 
@@ -804,6 +887,9 @@ static int tpd_remove(struct i2c_client *client)
 
     FTS_FUNC_ENTER();
 
+#if FTS_PSENSOR_EN
+    fts_proximity_exit(client);
+#endif
 #if FTS_GESTURE_EN
     fts_gesture_exit(client);
 #endif
@@ -828,15 +914,55 @@ static int tpd_remove(struct i2c_client *client)
 *  Output:
 *  Return:
 *****************************************************************************/
+//add by cassy begin
+/*
+void tpd_gpio_output_focal(int pin, int level)
+{
+	//mutex_lock(&tpd_set_gpio_mutex);
+	if (pin == 2) {
+		if (level)
+			pinctrl_select_state(pinctrl3, focal_power_output1);
+		else
+			pinctrl_select_state(pinctrl3, focal_power_output0);
+	} 
+	//mutex_unlock(&tpd_set_gpio_mutex);
+}
+#if FTS_POWER_SOURCE_CUST_EN
+#else
+
+static void tpd_power_on(int flag)
+{
+	if(flag)
+		{
+		
+		tpd_gpio_output_focal(GTP_enable_power_PORT, 1);
+		}
+		else
+		{
+		
+        tpd_gpio_output_focal(GTP_enable_power_PORT, 0);
+
+		}
+	}
+#endif*/
+//add by cassy end
+
 static int tpd_local_init(void)
 {
 
     FTS_FUNC_ENTER();
+	//modify by cassy begin
+#if FTS_POWER_SOURCE_CUST_EN///1//modify by cassy from 0 to 1
 
-#if FTS_POWER_SOURCE_CUST_EN
     if (fts_power_init() != 0)
         return -1;
+#else
+
+
+//tpd_power_on(1);
 #endif
+	//modify by cassy end
+	
 
     if (i2c_add_driver(&tpd_i2c_driver) != 0) {
         FTS_ERROR("[TPD]: Unable to add fts i2c driver!!");
@@ -845,8 +971,10 @@ static int tpd_local_init(void)
     }
 
     if (tpd_dts_data.use_tpd_button) {
+		
         tpd_button_setting(tpd_dts_data.tpd_key_num, tpd_dts_data.tpd_key_local,
                            tpd_dts_data.tpd_key_dim_local);
+                           
     }
 
 #if (defined(TPD_WARP_START) && defined(TPD_WARP_END))
@@ -895,28 +1023,40 @@ static void tpd_suspend(struct device *h)
         return;
     }
 
-#if FTS_GESTURE_EN
-    if (tpd_gesture_status) {
-    	ret = fts_gesture_suspend(ts_data->client);
-    	if (ret == 0) {
-        	/* Enter into gesture mode(suspend) */
-        	ts_data->suspended = true;
-        	return;
-    	}
+    if (ts_data->fw_loading) {
+        FTS_INFO("fw upgrade in process, can't suspend");
+        return;
+    }
+
+#if FTS_PSENSOR_EN
+    if (fts_proximity_suspend() == 0) {
+        fts_release_all_finger();
+        ts_data->suspended = true;
+        return;
     }
 #endif
 
-#if !FTS_MT_PROTOCOL_B_EN
-    fts_irq_disable();
+#if FTS_ESDCHECK_EN
+    fts_esdcheck_suspend();
 #endif
 
+#if FTS_GESTURE_EN
+    ret = fts_gesture_suspend(ts_data->client);
+    if (ret == 0) {
+        /* Enter into gesture mode(suspend) */
+        ts_data->suspended = true;
+        return;
+    }
+#endif
+
+    fts_irq_disable();
     /* TP enter sleep mode */
     ret = fts_i2c_write_reg(ts_data->client, FTS_REG_POWER_MODE, FTS_REG_POWER_MODE_SLEEP_VALUE);
     if (ret < 0) {
         FTS_ERROR("Set TP to sleep mode fail, ret=%d!", ret);
     }
 
-#if FTS_POWER_SOURCE_CUST_EN && !FTS_MT_PROTOCOL_B_EN
+#if FTS_POWER_SOURCE_CUST_EN
     fts_power_suspend();
 #endif
 
@@ -952,32 +1092,39 @@ static void tpd_resume(struct device *h)
         return;
     }
 
+#if FTS_PSENSOR_EN
+    if (fts_proximity_resume() == 0) {
+        ts_data->suspended = false;
+        return;
+    }
+#endif
+
     fts_release_all_finger();
 
-#if FTS_POWER_SOURCE_CUST_EN && !FTS_MT_PROTOCOL_B_EN
+#if FTS_POWER_SOURCE_CUST_EN
     fts_power_resume();
 #endif
 
-#if FTS_GESTURE_EN
-    fts_reset_proc(200);
-#endif
+    if (!ts_data->ic_info.is_incell) {
+        fts_reset_proc(200);
+    }
 
     /* Before read/write TP register, need wait TP to valid */
     fts_tp_state_recovery(ts_data->client);
 
+#if FTS_ESDCHECK_EN
+    fts_esdcheck_resume();
+#endif
+
 #if FTS_GESTURE_EN
-    if (tpd_gesture_status) {
-    	if (fts_gesture_resume(ts_data->client) == 0) {
-        	ts_data->suspended = false;
-        	FTS_FUNC_EXIT();
-        	return;
-    	}
+    if (fts_gesture_resume(ts_data->client) == 0) {
+        ts_data->suspended = false;
+        FTS_FUNC_EXIT();
+        return;
     }
 #endif
 
-#if !FTS_MT_PROTOCOL_B_EN
     fts_irq_enable();
-#endif
 
     ts_data->suspended = false;
     FTS_FUNC_EXIT();
@@ -1006,14 +1153,12 @@ static int __init tpd_driver_init(void)
 	
     FTS_FUNC_ENTER();
     FTS_INFO("Driver version: %s", FTS_DRIVER_VERSION);
-	
     tpd_get_dts_info();
-	
     if (tpd_dts_data.touch_max_num < 2)
         tpd_dts_data.touch_max_num = 2;
-    else if (tpd_dts_data.touch_max_num > FTS_MAX_POINTS_SUPPORT)
+    else if (tpd_dts_data.touch_max_num > FTS_MAX_POINTS_SUPPORT)///10
         tpd_dts_data.touch_max_num = FTS_MAX_POINTS_SUPPORT;
-	
+    FTS_INFO("tpd max touch num:%d", tpd_dts_data.touch_max_num);
     if (tpd_driver_add(&tpd_device_driver) < 0) {
         FTS_ERROR("[TPD]: Add FTS Touch driver failed!!");
     }
@@ -1039,6 +1184,6 @@ static void __exit tpd_driver_exit(void)
 module_init(tpd_driver_init);
 module_exit(tpd_driver_exit);
 
-MODULE_AUTHOR("FocalTech Driver Team & svoboda18");
+MODULE_AUTHOR("FocalTech Driver Team");
 MODULE_DESCRIPTION("FocalTech Touchscreen Driver for Mediatek");
-MODULE_LICENSE("GPL v3");
+MODULE_LICENSE("GPL v2");
