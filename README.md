@@ -31,11 +31,11 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 
 ## Acknowledgements:
 
-* [(@jmpfbmx)](https://github.com/jmpfbmx)
-* [(@parthibx24)](https://github.com/parthibx24)
-* [(@cvolo4yzhka)](https://github.com/cvolo4yzhka)
-* [(@zoggn)](https://github.com/zoggn)
-* [(@svoboda18)](https://github.com/svoboda18)
-* [(@raymondmiracle)](https://github.com/raymondmiracle)
-* [(@hsagent)](https://github.com/hsagent)
-* [(@0xXA)](https://github.com/0xXA)
+* [@jmpfbmx](https://github.com/jmpfbmx)
+* [@parthibx24](https://github.com/parthibx24)
+* [@cvolo4yzhka](https://github.com/cvolo4yzhka)
+* [@zoggn](https://github.com/zoggn)
+* [@svoboda18](https://github.com/svoboda18)
+* [@raymondmiracle](https://github.com/raymondmiracle)
+* [@hsagent](https://github.com/hsagent)
+* [@0xXA](https://github.com/0xXA)
