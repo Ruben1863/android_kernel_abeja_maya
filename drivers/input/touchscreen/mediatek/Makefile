@@ -1,4 +1,3 @@
-subdir-ccflags-y += -Werror
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/
 ccflags-y += -I$(srctree)/drivers/input/touchscreen/mediatek
 # In case the platform does NOT support this type of sensors
@@ -11,6 +10,7 @@ endif
 obj-$(CONFIG_TOUCHSCREEN_MTK)   += tpd_common_probe.o
 
 obj-$(CONFIG_TOUCHSCREEN_MTK)	+=  GT1151/
+obj-$(CONFIG_TOUCHSCREEN_MTK_FOCALTECH_TS)	+=  focaltech_touch/
 obj-$(CONFIG_TOUCHSCREEN_MTK_GT1151TB)	+=  GT1151TB/
 obj-$(CONFIG_TOUCHSCREEN_MTK_GT9XXTB_HN_NEW)	+=  gt9xxtb_hn_new/
 obj-$(CONFIG_TOUCHSCREEN_MTK_GT9XX_HOTKNOT)	+=  GT9XX_hotknot/
