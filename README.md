@@ -20,7 +20,7 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 | Other | `kd_camera_hw (i2c 0-0036)` | Yes | Yes |
 
 ## Known Issues
-- Hi843b: Poor quality? (Also just 8mpx)
+- Hi843b: Poor quality? Video recording now working (Also just 8mpx)
 - Gc5005: Poor quality? (Also just 5mpx)
 - ALS/PS: sensor is unknwon, so for now there isn't light/proximity sensor.
 
