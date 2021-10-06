@@ -141,8 +141,8 @@ static imgsensor_info_struct imgsensor_info = {
 	.cap_delay_frame = 3, 
 	.pre_delay_frame = 3, 
 	.video_delay_frame = 3,
-    .hs_video_delay_frame = 3,    //enter high speed video  delay frame num
-    .slim_video_delay_frame = 3,//enter slim video delay frame num
+    .hs_video_delay_frame = 1,    //enter high speed video  delay frame num
+    .slim_video_delay_frame = 1,//enter slim video delay frame num
 	
 	.isp_driving_current = ISP_DRIVING_6MA,
 	.sensor_interface_type = SENSOR_INTERFACE_TYPE_MIPI,
