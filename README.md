@@ -20,8 +20,6 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 | Other | `kd_camera_hw (i2c 0-0036)` | Yes | Yes |
 
 ## Known Issues
-- Hi843b: Poor quality? Video recording not working (Also just 8mpx)
-- Gc5005: Poor quality? (Also just 5mpx)
 - ALS/PS: sensor is unknwon, so for now there isn't light/proximity sensor.
 
 ## Current kernel features:
@@ -31,11 +29,11 @@ This is custom kernel (3.18.79) source for Bluboo Maya (MT6580) by Ruben1863
 
 ## Acknowledgements:
 
-* [(@jmpfbmx)](https://github.com/jmpfbmx)
-* [(@parthibx24)](https://github.com/parthibx24)
-* [(@cvolo4yzhka)](https://github.com/cvolo4yzhka)
-* [(@zoggn)](https://github.com/zoggn)
-* [(@svoboda18)](https://github.com/svoboda18)
-* [(@raymondmiracle)](https://github.com/raymondmiracle)
-* [(@hsagent)](https://github.com/hsagent)
-* [(@0xXA)](https://github.com/0xXA)
+* [@jmpfbmx](https://github.com/jmpfbmx)
+* [@parthibx24](https://github.com/parthibx24)
+* [@cvolo4yzhka](https://github.com/cvolo4yzhka)
+* [@zoggn](https://github.com/zoggn)
+* [@svoboda18](https://github.com/svoboda18)
+* [@raymondmiracle](https://github.com/raymondmiracle)
+* [@hsagent](https://github.com/hsagent)
+* [@0xXA](https://github.com/0xXA)
